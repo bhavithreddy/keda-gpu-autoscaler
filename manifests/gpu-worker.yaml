@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-worker
+  labels:
+    app: gpu-worker
+spec:
+  replicas: 0          # KEDA will control this
+  selector:
+    matchLabels: {app: gpu-worker}
+  template:
+    metadata:
+      labels: {app: gpu-worker}
+    spec:
+      nodeSelector:
+        gpu: "true"    # Only schedule on our "GPU" node (simulated)
+      containers:
+      - name: worker
+        image: busybox
+        command: ["sh", "-c", "echo GPU worker running job; sleep 30"]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"

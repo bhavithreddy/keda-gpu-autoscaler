@@ -1,0 +1,17 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: gpu-worker-scaler
+spec:
+  scaleTargetRef:
+    name: gpu-worker
+  minReplicaCount: 0       # scale to ZERO when queue empty
+  maxReplicaCount: 5
+  pollingInterval: 5       # check queue every 5 seconds
+  cooldownPeriod: 10       # scale down 10s after queue empties
+  triggers:
+  - type: redis
+    metadata:
+      address: redis.default.svc.cluster.local:6379
+      listName: gpu-jobs          # Redis list KEDA watches
+      listLength: "2"             # 1 pod per 2 jobs
